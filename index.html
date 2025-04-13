@@ -43,7 +43,7 @@
     let canvas = document.getElementById("wheel");
     let ctx = canvas.getContext("2d");
     let isSpinning = false;
-    let spins = parseInt(getParam("spins")) || 10;
+    let spins = parseInt(getParam("spins")) || 1;
     document.getElementById("spins").innerText = spins;
 
     let prizes = JSON.parse(localStorage.getItem("prizes")) || [
