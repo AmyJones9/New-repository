@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>幸运转盘</title>
+  <style>
+    body { text-align: center; font-family: Arial; }
+    #wheel { width: 400px; height: 400px; border-radius: 50%; margin: 20px auto; border: 10px solid #f5f5f5; }
+    #spinBtn { padding: 10px 30px; font-size: 18px; }
+    #pointer {
+      width: 0; height: 0;
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      border-left: 30px solid red;
+      position: absolute;
+      top: 320px;
+      left: calc(50% + 200px);
+      transform: translateY(-50%);
+      z-index: 10;
+    }
+    #popup {
+      display:none; position:fixed; top:30%; left:50%; transform:translate(-50%,-50%);
+      background:white; padding:30px; border:2px solid #ccc; border-radius:20px; box-shadow:0 0 10px gray;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 幸运转盘 🎯</h1>
+  <div id="pointer"></div>
+  <canvas id="wheel" width="400" height="400"></canvas>
+  <br>
+  <button id="spinBtn" onclick="spinWheel()">点击抽奖</button>
+  <p>剩余次数：<span id="spins">0</span></p>
+  <div id="popup"><h3 id="popupText"></h3><button onclick="closePopup()">关闭</button></div>
+  <audio id="tickSound" src="tick.mp3" preload="auto"></audio>
+  <script>
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    let canvas = document.getElementById("wheel");
+    let ctx = canvas.getContext("2d");
+    let isSpinning = false;
+    let spins = parseInt(getParam("spins")) || 10;
+    document.getElementById("spins").innerText = spins;
+
+    let prizes = JSON.parse(localStorage.getItem("prizes")) || [
+      { name: "一公斤大米", weight: 10 },
+      { name: "一公斤鸡胸肉", weight: 20 },
+      { name: "一公斤牛肉", weight: 30 },
+      { name: "自行车", weight: 15 },
+      { name: "电风扇", weight: 15 },
+      { name: "手机", weight: 10 }
+    ];
+
+    function drawWheel() {
+      let angle = 2 * Math.PI / prizes.length;
+      for (let i = 0; i < prizes.length; i++) {
+        ctx.beginPath();
+        ctx.fillStyle = `hsl(${i * 60}, 70%, 70%)`;
+        ctx.moveTo(200, 200);
+        ctx.arc(200, 200, 200, i * angle, (i + 1) * angle);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(200, 200);
+        ctx.rotate(i * angle + angle / 2);
+        ctx.fillStyle = "black";
+        ctx.font = "16px Arial";
+        ctx.fillText(prizes[i].name, 60, 0);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (isSpinning || spins <= 0) return;
+      isSpinning = true;
+      spins--;
+      document.getElementById("spins").innerText = spins;
+
+      const totalWeight = prizes.reduce((sum, p) => sum + p.weight, 0);
+      let rnd = Math.random() * totalWeight;
+      let selected = 0;
+      for (let i = 0; i < prizes.length; i++) {
+        rnd -= prizes[i].weight;
+        if (rnd <= 0) {
+          selected = i;
+          break;
+        }
+      }
+
+      const anglePerSlice = 360 / prizes.length;
+      const stopAngle = 360 * 5 - selected * anglePerSlice - anglePerSlice / 2;
+      let start = null;
+
+      function animateSpin(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        const duration = 3000;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const angle = ease * stopAngle;
+
+        canvas.style.transform = `rotate(${angle}deg)`;
+
+        if (progress < 1) {
+          if (Math.floor(angle) % 30 === 0) document.getElementById("tickSound").play();
+          requestAnimationFrame(animateSpin);
+        } else {
+          isSpinning = false;
+          showPopup(prizes[selected].name);
+        }
+      }
+      requestAnimationFrame(animateSpin);
+    }
+
+    function showPopup(prize) {
+      document.getElementById("popupText").innerText = `🎉 恭喜你获得：${prize}`;
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+
+    drawWheel();
+  </script>
+</body>
+</html>

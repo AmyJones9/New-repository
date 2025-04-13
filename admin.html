@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>后台设置 - 幸运转盘</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    label { display: inline-block; width: 120px; }
+    input { margin-bottom: 10px; }
+    .prize-item { margin-bottom: 15px; }
+    button { padding: 8px 16px; }
+  </style>
+</head>
+<body>
+  <h2>🎛️ 幸运转盘后台设置</h2>
+  <form id="configForm"></form>
+  <script>
+    let defaultPrizes = [
+      { name: "一公斤大米", weight: 10 },
+      { name: "一公斤鸡胸肉", weight: 20 },
+      { name: "一公斤牛肉", weight: 30 },
+      { name: "自行车", weight: 15 },
+      { name: "电风扇", weight: 15 },
+      { name: "手机", weight: 10 }
+    ];
+    let prizes = JSON.parse(localStorage.getItem("prizes")) || defaultPrizes;
+
+    const form = document.getElementById("configForm");
+
+    prizes.forEach((p, i) => {
+      const div = document.createElement("div");
+      div.className = "prize-item";
+      div.innerHTML = `
+        <label>奖品 ${i + 1} 名称：</label>
+        <input type="text" name="name${i}" value="${p.name}" />
+        <label>权重：</label>
+        <input type="number" name="weight${i}" value="${p.weight}" />
+      `;
+      form.appendChild(div);
+    });
+
+    const submitBtn = document.createElement("button");
+    submitBtn.type = "submit";
+    submitBtn.textContent = "保存设置";
+    form.appendChild(submitBtn);
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      const newPrizes = [];
+      for (let i = 0; i < prizes.length; i++) {
+        newPrizes.push({
+          name: form[`name${i}`].value,
+          weight: parseInt(form[`weight${i}`].value)
+        });
+      }
+      localStorage.setItem("prizes", JSON.stringify(newPrizes));
+      alert("✅ 设置已保存！");
+    };
+  </script>
+</body>
+</html>
