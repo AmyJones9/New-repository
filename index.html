@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>幸运转盘</title>
+  <title>লাকি হুইল ইভেন্ট</title>
   <style>
     body { text-align: center; font-family: Arial; }
     #wheel { width: 400px; height: 400px; border-radius: 50%; margin: 20px auto; border: 10px solid #f5f5f5; }
@@ -26,13 +26,13 @@
   </style>
 </head>
 <body>
-  <h1>🎯 幸运转盘 🎯</h1>
+  <h1>🎯 লাকি হুইল ইভেন্ট 🎯</h1>
   <div id="pointer"></div>
   <canvas id="wheel" width="400" height="400"></canvas>
   <br>
-  <button id="spinBtn" onclick="spinWheel()">点击抽奖</button>
-  <p>剩余次数：<span id="spins">0</span></p>
-  <div id="popup"><h3 id="popupText"></h3><button onclick="closePopup()">关闭</button></div>
+  <button id="spinBtn" onclick="spinWheel()">পুরস্কার জিততে ক্লিক করুন</button>
+  <p>বাকি ড্রয়ের সংখ্যা:<span id="spins">0</span></p>
+  <div id="popup"><h3 id="popupText"></h3><button onclick="closePopup()">বন্ধ</button></div>
   <audio id="tickSound" src="tick.mp3" preload="auto"></audio>
   <script>
     function getParam(name) {
@@ -116,7 +116,7 @@
     }
 
     function showPopup(prize) {
-      document.getElementById("popupText").innerText = `🎉 恭喜你获得：${prize}`;
+      document.getElementById("popupText").innerText = `🎉 পাওয়ার জন্য অভিনন্দন:${prize}`;
       document.getElementById("popup").style.display = "block";
     }
 
