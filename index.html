@@ -45,6 +45,12 @@
     let isSpinning = false;
     let spins = parseInt(getParam("spins")) || 1;
     document.getElementById("spins").innerText = spins;
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token') || 'default';
+
+    let key = `spin_times_${token}`;
+    let usedTimes = parseInt(localStorage.getItem(key) || '0');
+    const maxTimes = 3;
 
     let prizes = JSON.parse(localStorage.getItem("prizes")) || [
       { name: "66", weight: 50 },
@@ -54,7 +60,17 @@
       { name: "8666", weight: 0 },
       { name: "18666", weight: 0 }
     ];
+    function startSpin() {
+      if (usedTimes >= maxTimes) {
+       alert("চালিয়ে যান এবং পুরস্কার জেতার আরও সুযোগ পান");
+      return;
+    }
 
+      spinWheel(); // 抽奖逻辑
+
+      usedTimes += 1;
+      localStorage.setItem(key, usedTimes);
+    }
     function drawWheel() {
       let angle = 2 * Math.PI / prizes.length;
       for (let i = 0; i < prizes.length; i++) {
